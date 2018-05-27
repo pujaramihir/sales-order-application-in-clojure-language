@@ -1,1 +1,1 @@
-# sales-order-application-in-clojure-language
+# Sales order application in clojure language
