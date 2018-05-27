@@ -33,7 +33,8 @@
 )
 
 (defn displaySalesTable [custData prodData salesData]
-	(println (apply str (for [sales salesData] 
+	(def sortedSalesData (sort-by first salesData))
+	(println (apply str (for [sales sortedSalesData] 
 		(str 
 			(get sales 0) 
 			":"  
@@ -43,16 +44,48 @@
 	)))
 )
 
+(defn getCustomerIdByName [name custData]
+	(apply str (for [cust custData] 
+		(cond
+			(= name (get cust 1)) (get cust 0)
+			:else ""
+		)
+	))
+)
+
+(defn getProductPriceById [id prodData]
+	(apply str (for [prod prodData] 
+		(cond
+			(= id (get prod 0)) (get prod 2)
+			:else ""
+		)
+	))
+)
+
+(defn totalSalesForCustomer [custData prodData salesData]
+	(println "Enter Customer Name (Case Sensitive): ")
+	(def name (read-line))
+	(def id (getCustomerIdByName name custData))
+	(def prices (for [sales salesData]
+		(cond 
+			(= id (get sales 1)) (with-precision 2 (* (Double/parseDouble(getProductPriceById (get sales 2) prodData)) (Double/parseDouble (get sales 3))))
+			:else 0
+		)
+	))
+	(def totalPrice (reduce + prices))
+	(println (str "\n" (getCustNameById id custData) ": $" totalPrice))
+)
+
 (defn operations [userOption custData prodData salesData]
 	(println)
 	(cond 
     (= userOption "1") (displayCustomerTable custData)
     (= userOption "2") (displayProductTable prodData)
     (= userOption "3") (displaySalesTable custData prodData salesData)
-    (= userOption "4") (println "Option 4")
+    (= userOption "4") (totalSalesForCustomer custData prodData salesData)
     (= userOption "5") (println "Option 5")
     (= userOption "6") [(println "Good bye")(. System exit 0)]
-    :else "Invalid option...")
+    :else (println "Invalid option..."))
 	(println "Press any key to continue .....")
 	(read-line)
 )
