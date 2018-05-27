@@ -47,7 +47,7 @@
 (defn getCustomerIdByName [name custData]
 	(apply str (for [cust custData] 
 		(cond
-			(= name (get cust 1)) (get cust 0)
+			(= (clojure.string/lower-case name) (clojure.string/lower-case (get cust 1))) (get cust 0)
 			:else ""
 		)
 	))
@@ -76,6 +76,28 @@
 	(println (str "\n" (getCustNameById id custData) ": $" totalPrice))
 )
 
+(defn getProductIdByName [name prodData]
+	(apply str (for [prod prodData] 
+		(cond
+			(= (clojure.string/lower-case name) (clojure.string/lower-case (get prod 1))) (get prod 0)
+			:else ""
+		)
+	))
+)
+
+(defn totalCountForProduct [prodData salesData]
+	(println "Enter Product Name (Case Sensitive): ")
+	(def name (read-line))
+	(def id (getProductIdByName name prodData))
+	(def count (reduce + (for [sales salesData]
+		(cond
+			(= id (get sales 2)) (Integer/parseInt (get sales 3))
+			:else 0
+		)
+	)))
+	(println (str "\n" name ": " count))
+)
+
 (defn operations [userOption custData prodData salesData]
 	(println)
 	(cond 
@@ -83,7 +105,7 @@
     (= userOption "2") (displayProductTable prodData)
     (= userOption "3") (displaySalesTable custData prodData salesData)
     (= userOption "4") (totalSalesForCustomer custData prodData salesData)
-    (= userOption "5") (println "Option 5")
+    (= userOption "5") (totalCountForProduct prodData salesData)
     (= userOption "6") [(println "Good bye")(. System exit 0)]
     :else (println "Invalid option..."))
 	(println "Press any key to continue .....")
@@ -110,7 +132,7 @@
 	(def salesData (readfile "sales.txt"))
 	;;(println (getCustNameById "1" custData))
 	(while true (menu custData prodData salesData))
-	;;(menu custData prodData salesData)
+	(menu custData prodData salesData)
 )
 
 (main)
